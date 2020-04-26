@@ -1,38 +1,47 @@
 <?php
-$host ="localhost";
-$user="root";
+$servername ="localhost";
+$username="root";
 $password="";
-$db="demo";
+$dbname="multiuser";
 
-$con=mysqli_connect($host,$user,$password);
-mysqli_select_db($con,$db);
-if(isset($_POST['username'])){
-    $uname=$_POST['username'];
+$conn =mysqli_connect($servername,$username,$password,$dbname);
+
+
+if(isset($_POST['LOGIN'])){
+    $user=$_POST['username'];
     $password=$_POST['password'];
+    $usertype=$_POST['utype'];
+    
+    $query = "SELECT * FROM `multiuser` WHERE username='".$user."' AND password ='".$password."' and usertype = '".$usertype."'";
     
     
-    $sql = "select * from loginform where user='".$uname."' AND Pass='".$password."'
-    limit 1";
-    $result= mysqli_query($con,$sql);
+    $result= mysqli_query($conn,$query);
+    $numrow = mysqli_num_rows($result);
     
-    if(mysqli_num_rows($result)==1){
-        echo "u have successfully logged in";
-        exit();
+    if($numrow==1){
+       $row=mysqli_fetch_array($result);
+           
+            if($row['usertype']=="admin"){
+                header('location: admin.php');
+            }
+        if($row['usertype']=="doktor"){
+            header('location: doktor.php');
+        }
+        if($row['usertype']=="pacient"){
+            header('location: pacient.php');
+        }
+    }
         
-    }
-    else {
-        echo "you have entered incorrect password";
-        exit();
-    }
 }
+
 ?>
 
 
 
 <html>
 <head>
- <title> Login Form in HTML5 and CSS3</title>
- <link rel="stylesheet" a href="Css3/style2.css">
+ <title> Login Form</title>
+ 
  <link rel="stylesheet" a href="Css3/style.css">
  <link rel="stylesheet" a href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
@@ -50,22 +59,22 @@ img {
 <body>
  <div class="container">
  <img src="https://i.pinimg.com/564x/d3/28/64/d32864ef49da3f23c9fd57109dc876e4.jpg" />
- <form method="$POST" action="#">
+ <form method="POST" action="loginform.php" >
      <div>
-  <input type="radio" name="login" value="doktor"> DOKTOR
-  <input type="radio" name="login" value="pacient"> PACIENT
-  <input type="radio" name="login" value="admin"> ADMIN
+  <input type="radio" name="utype" value="doktor"> DOKTOR
+  <input type="radio" name="utype" value="pacient"> PACIENT
+  <input type="radio" name="utype" value="admin"> ADMIN
      </div>
  <div class="form-input">
      <i class="fa fa-user icon"></i>
- <input type="text" name="text" placeholder="Enter the User Name"/> 
+ <input type="text" name="username" placeholder="Enter the User Name"/> 
  </div>
  <div class="form-input">
      <i class="fa fa-key icon"></i>
  <input type="password" name="password" placeholder="password"/>
  </div>
     
- <input type="submit" type="submit" value="LOGIN" class="btn-login" />
+ <input type="submit" name="LOGIN" value="LOGIN" class="btn-login" />
      </form>
  </div>
 </body>
